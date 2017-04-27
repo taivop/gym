@@ -12,21 +12,28 @@ UP = 3
 
 MAPS = {
     "4x4": [
-        "SFFF",
-        "FHFH",
-        "FFFH",
-        "HFFG"
+        "S...",
+        ".X.X",
+        "...X",
+        "X..G"
     ],
     "8x8": [
-        "SFFFFFFF",
-        "FFFFFFFF",
-        "FFFHFFFF",
-        "FFFFFHFF",
-        "FFFHFFFF",
-        "FHHFFFHF",
-        "FHFFHFHF",
-        "FFFHFFFG"
+        "S.......",
+        "........",
+        "...X....",
+        ".....X..",
+        "...X....",
+        ".XX...X.",
+        ".X..X.X.",
+        "...X...G"
     ],
+    "2paths": [
+        "S....",
+        ".X...",
+        ".X...",
+        "..XX.",
+        "....G"
+    ]
 }
 
 class FrozenLakeEnv(discrete.DiscreteEnv):
@@ -68,10 +75,15 @@ class FrozenLakeEnv(discrete.DiscreteEnv):
         nA = 4
         nS = nrow * ncol
 
-        isd = np.array(desc == b'S').astype('float64').ravel()
+        START = b'S'
+        TERMINALS = b'GX'
+        GOAL = b'G'
+
+        isd = np.array(desc == START).astype('float64').ravel()
         isd /= isd.sum()
 
         P = {s : {a : [] for a in range(nA)} for s in range(nS)}
+
 
         def to_s(row, col):
             return row*ncol + col
@@ -92,7 +104,7 @@ class FrozenLakeEnv(discrete.DiscreteEnv):
                 for a in range(4):
                     li = P[s][a]
                     letter = desc[row, col]
-                    if letter in b'GH':
+                    if letter in TERMINALS:
                         li.append((1.0, s, 0, True))
                     else:
                         if is_slippery:
@@ -100,15 +112,15 @@ class FrozenLakeEnv(discrete.DiscreteEnv):
                                 newrow, newcol = inc(row, col, b)
                                 newstate = to_s(newrow, newcol)
                                 newletter = desc[newrow, newcol]
-                                done = bytes(newletter) in b'GH'
-                                rew = float(newletter == b'G')
+                                done = bytes(newletter) in TERMINALS
+                                rew = float(newletter == GOAL)
                                 li.append((1.0/3.0, newstate, rew, done))
                         else:
                             newrow, newcol = inc(row, col, a)
                             newstate = to_s(newrow, newcol)
                             newletter = desc[newrow, newcol]
-                            done = bytes(newletter) in b'GH'
-                            rew = float(newletter == b'G')
+                            done = bytes(newletter) in TERMINALS
+                            rew = float(newletter == GOAL)
                             li.append((1.0, newstate, rew, done))
 
         super(FrozenLakeEnv, self).__init__(nS, nA, P, isd)
