@@ -64,7 +64,7 @@ class FrozenLakeEnv(discrete.DiscreteEnv):
 
     metadata = {'render.modes': ['human', 'ansi']}
 
-    def __init__(self, desc=None, map_name="4x4",is_slippery=True):
+    def __init__(self, desc=None, map_name="4x4", is_slippery=True, p_slipping=1.0/3.0):
         if desc is None and map_name is None:
             raise ValueError('Must provide either desc or map_name')
         elif desc is None:
@@ -114,7 +114,10 @@ class FrozenLakeEnv(discrete.DiscreteEnv):
                                 newletter = desc[newrow, newcol]
                                 done = bytes(newletter) in TERMINALS
                                 rew = float(newletter == GOAL)
-                                li.append((1.0/3.0, newstate, rew, done))
+                                if b == a:  # Successfully take chosen action
+                                    li.append((1 - 2 * p_slipping, newstate, rew, done))
+                                else:       # Slipping
+                                    li.append((p_slipping, newstate, rew, done))
                         else:
                             newrow, newcol = inc(row, col, a)
                             newstate = to_s(newrow, newcol)
