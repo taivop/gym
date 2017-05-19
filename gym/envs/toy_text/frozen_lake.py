@@ -65,7 +65,7 @@ class FrozenLakeEnv(discrete.DiscreteEnv):
     metadata = {'render.modes': ['human', 'ansi']}
 
     def __init__(self, desc=None, map_name="4x4", p_slipping=1.0/3.0):
-        is_slippery = p_slipping == 0.0
+        is_slippery = p_slipping != 0.0
         if desc is None and map_name is None:
             raise ValueError('Must provide either desc or map_name')
         elif desc is None:
