@@ -33,6 +33,14 @@ MAPS = {
         ".X...",
         ".XXX.",
         "....G"
+    ],
+    "2paths_dangerous": [
+        ".S....",
+        "X.X...",
+        "X.X...",
+        "X.XXX.",
+        "X....G",
+        "XXXXXX"
     ]
 }
 
