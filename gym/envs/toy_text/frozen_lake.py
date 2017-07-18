@@ -184,3 +184,9 @@ class FrozenLakeEnv(discrete.DiscreteEnv):
 
         if mode != 'human':
             return outfile
+
+    def get_features(self, state):
+        """Get the feature vector corresponding to state. Returns (vertical, horizontal) coordinates of the state."""
+        i = state // self.ncol
+        j = state % self.ncol
+        return i, j
