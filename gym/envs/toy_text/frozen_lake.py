@@ -187,6 +187,9 @@ class FrozenLakeEnv(discrete.DiscreteEnv):
 
     def get_features(self, state):
         """Get the feature vector corresponding to state. Returns (vertical, horizontal) coordinates of the state."""
+        MAP_SIZE = len(self.desc)
         i = state // self.ncol
         j = state % self.ncol
-        return i, j
+        x = j
+        y = MAP_SIZE - 1 - i
+        return x, y
