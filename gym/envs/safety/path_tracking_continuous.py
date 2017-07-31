@@ -81,4 +81,15 @@ class PathTrackingEnv(gym.Env):
         return np.array(self.state)
 
     def _render(self, mode='human', close=False):
-        pass  # TODO
+        if self.viewer is None:
+            from matplotlib import pyplot as plt
+            from matplotlib.patches import Rectangle
+            fig, ax = plt.subplots(1)
+            rect_background = Rectangle((0, self.height), self.width, self.height, facecolor="gray")
+            rect_goal = Rectangle((self.goal_box[1], self.goal_box[0]),
+                                  width=self.goal_box[3] - self.goal_box[1],
+                                  height=self.goal_box[2] - self.goal_box[0],
+                                  facecolor="green")
+            ax.add_patch(rect_background)
+            ax.add_patch(rect_goal)
+        # TODO
