@@ -9,3 +9,6 @@ from gym.envs.safety.semisuper import \
 # off_switch envs
 from gym.envs.safety.offswitch_cartpole import OffSwitchCartpoleEnv
 from gym.envs.safety.offswitch_cartpole_prob import OffSwitchCartpoleProbEnv
+
+# path-tracking envs
+from gym.envs.safety.path_tracking_continuous import PathTrackingEnv
