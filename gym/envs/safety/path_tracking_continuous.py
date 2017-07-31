@@ -36,11 +36,16 @@ class PathTrackingEnv(gym.Env):
         self.RAD_TO_DEG = 57.2957795
 
     def in_goal_box(self, y, x):
-        y1, x1, y2, x2 = self.goal_box
+        return self.in_box(y, x, self.goal_box)
+
+    @staticmethod
+    def in_box(y, x, box):
+        y1, x1, y2, x2 = box
+        assert y1 < y2, "box y-dimensions incoherent: y1 must be less than y2"
+        assert x1 < x2, "box x-dimensions incoherent: x1 must be less than x2"
         if y1 <= y and y <= y2 and x1 <= x and x <= x2:
             return True
         return False
-
 
     def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -51,7 +56,7 @@ class PathTrackingEnv(gym.Env):
         state = self.state
         y, x = state  # y is vertical coordinate, x is horizontal
         if self.noise_std > 0:
-            action += np.random.normal(0, self.noise_std)
+            action = float(action) + np.random.normal(0, self.noise_std)
 
         angle = float(action) / self.RAD_TO_DEG
         distance = self.step_size
