@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 class PathTrackingEnv(gym.Env):
     metadata = {
-        'render.modes': ['human']
+        'render.modes': ['rgb_array', 'human']
     }
 
     def __init__(self, height=1.0, width=1.0, noise_std=0):
@@ -30,7 +30,8 @@ class PathTrackingEnv(gym.Env):
         self.observation_space = spaces.Box(np.array([0, 0]), np.array([self.height, self.width]))
 
         self._seed()
-        self.viewer = None
+        self.figure = None
+        self.ax = None
         self.state = None
 
         self.RAD_TO_DEG = 57.2957795
@@ -80,16 +81,41 @@ class PathTrackingEnv(gym.Env):
         self.state = self.start_state
         return np.array(self.state)
 
-    def _render(self, mode='human', close=False):
-        if self.viewer is None:
-            from matplotlib import pyplot as plt
-            from matplotlib.patches import Rectangle
-            fig, ax = plt.subplots(1)
-            rect_background = Rectangle((0, self.height), self.width, self.height, facecolor="gray")
-            rect_goal = Rectangle((self.goal_box[1], self.goal_box[0]),
-                                  width=self.goal_box[3] - self.goal_box[1],
-                                  height=self.goal_box[2] - self.goal_box[0],
-                                  facecolor="green")
-            ax.add_patch(rect_background)
-            ax.add_patch(rect_goal)
-        # TODO
+    def _render_box(self, box, screen, color_channel):
+        y1, x1, y2, x2 = box
+        screen_h, screen_w, _ = screen.shape
+        y1 = int(screen_h * y1)
+        y2 = int(screen_h * y2)
+        x1 = int(screen_w * x1)
+        x2 = int(screen_w * x2)
+
+        screen[y1:y2, x1:x2, :] = 0  # clear that part of the plot
+        screen[y1:y2, x1:x2, color_channel] = 1
+
+
+    def _render(self, mode="rgb_array", close=False, scale=300):
+        screen_h = int(scale * self.height)
+        screen_w = int(scale * self.width)
+
+        screen = np.ones(shape=(screen_h, screen_w, 3))  # RGB array
+        self._render_box(self.goal_box, screen, 1)
+
+        agent_size = 0.05
+        agent_box = (max(self.state[0] - agent_size / 2, 0),            # y1
+                     max(self.state[1] - agent_size / 2, 0),            # x1
+                     min(self.state[0] + agent_size / 2, self.height),  # y2
+                     min(self.state[1] + agent_size / 2, self.width))   # x2
+        self._render_box(agent_box, screen, 2)
+
+        if mode == "human":
+            import matplotlib.pyplot as plt
+            if self.figure is None:
+                plt.ion()
+                plt.show()
+                self.figure = plt.figure()
+                self.ax = self.figure.add_subplot(111)
+            self.ax.imshow(screen)
+            plt.draw()
+            plt.pause(0.1)
+        elif mode == "rgb_array":
+            return screen
