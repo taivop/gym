@@ -120,11 +120,12 @@ class PathTrackingEnv(gym.Env):
         self._render_box(self.goal_box, screen, "GREEN")
 
         agent_size = 0.05
-        agent_box = (max(self.state[0] - agent_size / 2, 0),            # y1
-                     max(self.state[1] - agent_size / 2, 0),            # x1
-                     min(self.state[0] + agent_size / 2, self.height),  # y2
-                     min(self.state[1] + agent_size / 2, self.width))   # x2
-        self._render_box(agent_box, screen, "BLUE")
+        if self.state is not None:
+            agent_box = (max(self.state[0] - agent_size / 2, 0),            # y1
+                         max(self.state[1] - agent_size / 2, 0),            # x1
+                         min(self.state[0] + agent_size / 2, self.height),  # y2
+                         min(self.state[1] + agent_size / 2, self.width))   # x2
+            self._render_box(agent_box, screen, "BLUE")
 
         for lava_box in self.lava_boxes:
             self._render_box(lava_box, screen, "RED")
