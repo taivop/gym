@@ -24,10 +24,6 @@ class PathTrackingEnv(gym.Env):
         self.step_size = 0.1
         self.start_state = (0.5, 0.0)               # y, x
         self.goal_box = (0.4, 0.9, 0.6, 1.0)        # y1, x1, y2, x2
-        self.lava_boxes = [
-            (0, 0.4, 0.2, 0.6),
-            (0.8, 0.4, 1.0, 0.6)
-        ]
 
         self.action_space = spaces.Box(0, 360, shape=(1,))
         self.observation_space = spaces.Box(np.array([0, 0]), np.array([self.height, self.width]))
@@ -41,12 +37,6 @@ class PathTrackingEnv(gym.Env):
 
     def in_goal_box(self, y, x):
         return self.in_box(y, x, self.goal_box)
-
-    def in_lava_box(self, y, x):
-        for lava_box in self.lava_boxes:
-            if self.in_box(y, x, lava_box):
-                return True
-        return False
 
     @staticmethod
     def in_box(y, x, box):
@@ -66,9 +56,6 @@ class PathTrackingEnv(gym.Env):
         state = self.state
         y, x = state  # y is vertical coordinate, x is horizontal
 
-        if self.in_lava_box(y, x):  # If we're already in lava, there will be no additional movement
-            return np.array(self.state), 0.0, True, {}
-
         if self.noise_std > 0:
             action = float(action) + np.random.normal(0, self.noise_std)
 
@@ -86,8 +73,6 @@ class PathTrackingEnv(gym.Env):
         done = False
         if self.in_goal_box(new_y, new_x):
             reward = 1.0
-            done = True
-        if self.in_lava_box(new_y, new_x):
             done = True
 
         return np.array(self.state), reward, done, {}
@@ -127,9 +112,6 @@ class PathTrackingEnv(gym.Env):
                          min(self.state[1] + agent_size / 2, self.width))   # x2
             self._render_box(agent_box, screen, "BLUE")
 
-        for lava_box in self.lava_boxes:
-            self._render_box(lava_box, screen, "RED")
-
         if mode == "human":
             import matplotlib.pyplot as plt
             if self.figure is None:
@@ -142,3 +124,8 @@ class PathTrackingEnv(gym.Env):
             plt.pause(0.1)
         elif mode == "rgb_array":
             return screen
+
+
+#class PathTrackingTeacher:
+#
+#    def __init__(self):
