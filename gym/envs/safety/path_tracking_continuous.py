@@ -25,7 +25,7 @@ class PathTrackingEnv(gym.Env):
         self.start_state = (0.5, 0.0)               # y, x
         self.goal_box = (0.4, 0.9, 0.6, 1.0)        # y1, x1, y2, x2
 
-        self.horizon = 3 * int(self.width / self.step_size)  # TODO pretty heuristic atm
+        self.horizon = 10 * int(self.width / self.step_size)  # TODO pretty heuristic atm
 
         self.action_space = spaces.Box(0, 360, shape=(1,))
         self.observation_space = spaces.Box(np.array([0, 0]), np.array([self.height, self.width]))
@@ -34,6 +34,7 @@ class PathTrackingEnv(gym.Env):
         self.figure = None
         self.ax = None
         self.state = None
+        self.t = 0
 
         self.RAD_TO_DEG = 57.2957795
 
@@ -77,10 +78,15 @@ class PathTrackingEnv(gym.Env):
             reward = 1.0
             done = True
 
+        self.t += 1
+        if self.t >= self.horizon:
+            done = True
+
         return np.array(self.state), reward, done, {}
 
     def _reset(self):
         self.state = self.start_state
+        self.t = 0
         return np.array(self.state)
 
     def _render_box(self, box, screen, color_channel):
