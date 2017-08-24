@@ -25,6 +25,8 @@ class PathTrackingEnv(gym.Env):
         self.start_state = (0.5, 0.0)               # y, x
         self.goal_box = (0.4, 0.9, 0.6, 1.0)        # y1, x1, y2, x2
 
+        self.horizon = 3 * int(self.width / self.step_size)  # TODO pretty heuristic atm
+
         self.action_space = spaces.Box(0, 360, shape=(1,))
         self.observation_space = spaces.Box(np.array([0, 0]), np.array([self.height, self.width]))
 
