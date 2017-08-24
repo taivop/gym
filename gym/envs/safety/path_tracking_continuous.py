@@ -52,6 +52,7 @@ class PathTrackingEnv(gym.Env):
         return [seed]
 
     def _step(self, action):
+        action = action[0]
         assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
         state = self.state
         y, x = state  # y is vertical coordinate, x is horizontal
