@@ -125,8 +125,3 @@ class PathTrackingEnv(gym.Env):
             plt.pause(0.1)
         elif mode == "rgb_array":
             return screen
-
-
-#class PathTrackingTeacher:
-#
-#    def __init__(self):
