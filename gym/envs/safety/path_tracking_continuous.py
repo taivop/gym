@@ -55,8 +55,16 @@ class PathTrackingEnv(gym.Env):
         return [seed]
 
     def _step(self, action):
+        new_state, reward, done, _ = self.dynamics_step(self.state, action)
+        self.t += 1
+        self.state = new_state[0], new_state[1]
+        if self.t >= self.horizon:
+            done = True
+
+        return new_state, reward, done, _
+
+    def dynamics_step(self, state, action):
         assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
-        state = self.state
         y, x = state  # y is vertical coordinate, x is horizontal
 
         if self.noise_std > 0:
@@ -69,8 +77,7 @@ class PathTrackingEnv(gym.Env):
 
         new_y = min(self.height, max(0, y + dy))  # Make sure we're within bounds
         new_x = min(self.width, max(0, x + dx))
-
-        self.state = new_y, new_x
+        new_state = new_y, new_x
 
         reward = 0.0
         done = False
@@ -78,11 +85,7 @@ class PathTrackingEnv(gym.Env):
             reward = 1.0
             done = True
 
-        self.t += 1
-        if self.t >= self.horizon:
-            done = True
-
-        return np.array(self.state), reward, done, {}
+        return np.array(new_state), reward, done, {}
 
     def _reset(self):
         self.state = self.start_state
