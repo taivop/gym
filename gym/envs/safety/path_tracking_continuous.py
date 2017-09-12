@@ -12,7 +12,7 @@ class PathTrackingEnv(gym.Env):
         'render.modes': ['rgb_array', 'human']
     }
 
-    def __init__(self, height=1.0, width=1.0, noise_std=0):
+    def __init__(self, height=1.0, width=1.0, noise_std=0, step_size=0.1):
         """Initialise the path tracking environment.
             :param height: Height of the world.
             :param width: Width of the world
@@ -21,7 +21,7 @@ class PathTrackingEnv(gym.Env):
         self.height = height
         self.width = width
         self.noise_std = noise_std
-        self.step_size = 0.1
+        self.step_size = step_size
         self.start_state = (0.5, 0.0)               # y, x
         self.goal_box = (0.4, 0.9, 0.6, 1.0)        # y1, x1, y2, x2
 
