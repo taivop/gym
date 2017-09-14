@@ -27,7 +27,7 @@ class PathTrackingEnv(gym.Env):
 
         self.horizon = 10 * int(self.width / self.step_size)  # TODO pretty heuristic atm
 
-        self.action_space = spaces.Box(0, 360, shape=(1,))
+        self.action_space = spaces.Box(np.array([-1, -1]), np.array([1, 1]))
         self.observation_space = spaces.Box(np.array([0, 0]), np.array([self.height, self.width]))
 
         self._seed()
@@ -68,12 +68,13 @@ class PathTrackingEnv(gym.Env):
         y, x = state  # y is vertical coordinate, x is horizontal
 
         if self.noise_std > 0:
-            action = float(action) + np.random.normal(0, self.noise_std)
+            action = action + np.random.normal(0, self.noise_std, size=action.shape)
 
-        angle = float(action) / self.RAD_TO_DEG
+        action = action / np.linalg.norm(action)  # Normalise action to unit circle
+
         distance = self.step_size
-        dy = distance * math.sin(angle)
-        dx = distance * math.cos(angle)
+        dy = distance * action[0]
+        dx = distance * action[1]
 
         new_y = min(self.height, max(0, y + dy))  # Make sure we're within bounds
         new_x = min(self.width, max(0, x + dx))
